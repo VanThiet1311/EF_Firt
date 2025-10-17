@@ -1,3 +1,3 @@
-export const PATH_ROUTER =  {
-        LOGIN:'/auth/login',
-    }
+export const PATH_ROUTER = {
+  LOGIN: "/auth/login",
+};
