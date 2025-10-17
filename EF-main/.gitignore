@@ -1,0 +1,45 @@
+# Build results
+bin/
+obj/
+out/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider IDE
+.idea/
+*.sln.iml
+
+# Dotnet Core
+*.dll
+*.exe
+*.pdb
+*.app
+*.apk
+*.nuget.props
+*.nupkg
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+*.nuspec
+
+# Logs
+*.log
+
+# Others
+*.vspscc
+*.vssscc
+_ReSharper*/
+*.DotSettings.user
+*.dotCover
+*.userprefs
