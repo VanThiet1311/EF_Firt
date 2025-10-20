@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using EF_ENTITY.EF_DBContext;
+using MiniEfApi.Entities;
 namespace MiniEfApi.Data
 {
     public class AppDbContext : BaseDbContext

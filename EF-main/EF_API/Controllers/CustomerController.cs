@@ -1,10 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using MiniEfApi.Services;      // CustomerService
-using MiniEfApi.Data;          // Customer Entity
+using MiniEfApi.Entities;          // Customer Entity
 using DTOs = MiniEfApi.Dtos;
 using Model = MiniEfApi.Models;
 
-// CustomerModel
 namespace MiniEfApi.Controllers
 {
     [ApiController]
@@ -12,6 +11,7 @@ namespace MiniEfApi.Controllers
     public class CustomersController : ControllerBase
     {
         private readonly CustomerService _service;
+
         public CustomersController(CustomerService service)
         {
             _service = service;
@@ -21,20 +21,20 @@ namespace MiniEfApi.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var customers = await _service.GetCustomersAsync();
+            var customers = await _service.GetAllCustomersAsync();
             var response = customers.Select(c => new DTOs.CustomerReponseDto
             {
                 Name = c.Name,
                 Email = c.Email
             }).ToList();
-            return Ok(customers);
+            return Ok(response);
         }
 
         // GET: api/customers/{id}
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var customer = await _service.GetByIdCustomerAsync(id);
+            var customer = await _service.GetCustomerByIdAsync(id);
             if (customer == null)
                 return NotFound();
             return Ok(customer);
@@ -42,40 +42,47 @@ namespace MiniEfApi.Controllers
 
         // POST: api/customers
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] Model.Customer model)
+        public async Task<IActionResult> Create([FromBody] Customer model)
         {
             if (model == null)
                 return BadRequest();
 
-            var customer = await _service.CreateCustomerAsync(model);
+            await _service.AddCustomerAsync(model);
             return CreatedAtAction(
                 nameof(GetById),
-                new { id = customer.Id },
-                customer
-         );
+                new { id = model.Id },
+                model
+            );
         }
+
         // PUT: api/customers/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] Model.Customer model)
-        {
-            if (model == null)
-                return BadRequest();
+        // [HttpPut("{id}")]
+        // public async Task<IActionResult> Update(int id, [FromBody] Customer model)
+        // {
+        //     if (model == null)
+        //         return BadRequest();
 
-            var customer = await _service.UpdateCustomerAsync(id, model);
-            if (customer == null)
-                return NotFound();
+        //     var existingCustomer = await _service.GetCustomerByIdAsync(id);
+        //     if (existingCustomer == null)
+        //         return NotFound();
 
-            return Ok(customer);
-        }
+        //     // Update fields
+        //     existingCustomer.Name = model.Name;
+        //     existingCustomer.Email = model.Email;
+
+        //     await _service.UpdateCustomerAsync(existingCustomer);
+        //     return Ok(existingCustomer);
+        // }
 
         // DELETE: api/customers/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var result = await _service.DeleteCustomerAsync(id);
-            if (!result)
+            var customer = await _service.GetCustomerByIdAsync(id);
+            if (customer == null)
                 return NotFound();
 
+            await _service.DeleteCustomerAsync(customer);
             return Ok(new { message = "Deleted successfully" });
         }
     }
