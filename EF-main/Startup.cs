@@ -2,8 +2,11 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using MiniEfApi.Data;
+using MiniEfApi.Services;
+using EF_CORE;
+using EF_ENTITY;
+using EF_BASE.RepositoryBase;
 
 namespace MiniEfApi
 {
@@ -16,22 +19,31 @@ namespace MiniEfApi
             Configuration = configuration;
         }
 
-        // add service vào DI container
         public void ConfigureServices(IServiceCollection services)
         {
-            // 1️⃣ EF Core + MySQL
+            // EF Core + MySQL
             services.AddDbContext<AppDbContext>(options =>
                 options.UseMySql(
                     Configuration.GetConnectionString("DefaultConnection"),
-                    new MySqlServerVersion(new Version(8, 0, 33)) // đổi version MySQL theo máy bạn
+                    ServerVersion.AutoDetect(Configuration.GetConnectionString("DefaultConnection"))
                 )
             );
 
-            // 2️⃣ Controllers
+            services.AddScoped(typeof(IRepositoryBase<>), typeof(Repository<>));
+            services.AddScoped(typeof(DomainService<>));
+            services.AddScoped<CustomerService>();
+
             services.AddControllers();
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowFrontend", builder =>
+                    builder.AllowAnyOrigin()
+                           .AllowAnyHeader()
+                           .AllowAnyMethod()
+                );
+            });
         }
 
-        // Cấu hình middleware pipeline
         public void Configure(WebApplication app)
         {
             if (app.Environment.IsDevelopment())
@@ -40,11 +52,8 @@ namespace MiniEfApi
             }
 
             app.UseHttpsRedirection();
-
-            // Xác thực/ủy quyền (nếu có)
+            app.UseCors("AllowFrontend");
             app.UseAuthorization();
-
-            // Map các controller route
             app.MapControllers();
         }
     }
