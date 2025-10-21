@@ -2,9 +2,9 @@ import { Outlet } from "react-router-dom";
 const LayoutDefault = () => {
   return (
     <div>
-      <header></header>
+      <header>Header</header>
          <Outlet />
-      <footer></footer>
+      <footer>Footer</footer>
     </div>
   );
 };

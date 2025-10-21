@@ -16,6 +16,14 @@ const Router = createBrowserRouter([
           </Suspense>
         ),
       },
+        {
+        path: PATH_ROUTER.HOME,
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <Login />
+          </Suspense>
+        ),
+      },
     ],
   },
 ]);
